@@ -25,7 +25,13 @@ public class TestCases {
         System.out.println("Constructor: TestCases");
 
         WebDriverManager.chromedriver().timeout(30).setup();
+
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--start-maximized");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--remote-allow-origins=*");
+
         LoggingPreferences logs = new LoggingPreferences();
         logs.enable(LogType.BROWSER, Level.ALL);
         logs.enable(LogType.DRIVER, Level.ALL);
@@ -34,9 +40,11 @@ public class TestCases {
         System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, "chromedriver.log");
 
         driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
+        // Do NOT call maximize() - it causes crash on some Chrome versions
+        // driver.manage().window().maximize();
+
+        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
         wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
@@ -80,7 +88,7 @@ public class TestCases {
         String currentUrl = driver.getCurrentUrl();
         System.out.println("Current URL: " + currentUrl);
         if (currentUrl.toLowerCase().contains("google")) {
-            System.out.println("URL verification passed – contains google");
+            System.out.println("URL verification passed - contains google");
         }
 
         System.out.println("Waiting for calculator to load...");
@@ -94,9 +102,9 @@ public class TestCases {
         System.out.println("Initial display value: '" + initialValue + "'");
 
         if (initialValue.equals("0") || initialValue.isEmpty()) {
-            System.out.println("Initial display is 0 – PASSED");
+            System.out.println("Initial display is 0 - PASSED");
         } else {
-            System.out.println("Initial display is NOT 0 – FAILED. Actual: " + initialValue);
+            System.out.println("Initial display is NOT 0 - FAILED. Actual: " + initialValue);
         }
 
         System.out.println("end Test case: testCase01");
@@ -144,7 +152,7 @@ public class TestCases {
         System.out.println("Start Test case: testCase03");
         ensureCalculatorReady();
 
-        // 10 × 3
+        // 10 * 3
         clickCalculatorButton("1");
         clickCalculatorButton("0");
         clickCalculatorButton("multiply");
@@ -152,7 +160,7 @@ public class TestCases {
         clickCalculatorButton("equals");
 
         String result = getDisplayValue();
-        System.out.println("10 × 3 = " + result);
+        System.out.println("10 * 3 = " + result);
         if (result.equals("30")) {
             System.out.println("Multiplication PASSED");
         } else {
@@ -178,7 +186,7 @@ public class TestCases {
         System.out.println("Start Test case: testCase04");
         ensureCalculatorReady();
 
-        // 20 ÷ 4
+        // 20 / 4
         clickCalculatorButton("2");
         clickCalculatorButton("0");
         clickCalculatorButton("divide");
@@ -186,7 +194,7 @@ public class TestCases {
         clickCalculatorButton("equals");
 
         String result = getDisplayValue();
-        System.out.println("20 ÷ 4 = " + result);
+        System.out.println("20 / 4 = " + result);
         if (result.equals("5")) {
             System.out.println("Division PASSED");
         } else {
@@ -207,28 +215,36 @@ public class TestCases {
         ));
     }
 
-    // ========== ULTRA-FAST click method ==========
     private void clickCalculatorButton(String label) {
         try {
             String ariaLabel = label.toLowerCase();
 
             switch (label.toLowerCase()) {
                 case "+":
-                case "plus":     ariaLabel = "plus";        break;
+                case "plus":
+                    ariaLabel = "plus";
+                    break;
                 case "-":
-                case "−":
-                case "minus":    ariaLabel = "minus";       break;
-                case "×":
+                case "minus":
+                    ariaLabel = "minus";
+                    break;
                 case "*":
-                case "multiply": ariaLabel = "multiply";    break;
-                case "÷":
+                case "multiply":
+                    ariaLabel = "multiply";
+                    break;
                 case "/":
-                case "divide":   ariaLabel = "divide";      break;
+                case "divide":
+                    ariaLabel = "divide";
+                    break;
                 case "=":
-                case "equals":   ariaLabel = "equals";      break;
+                case "equals":
+                    ariaLabel = "equals";
+                    break;
                 case "ac":
                 case "ce":
-                case "clear":    ariaLabel = "clear entry"; break;
+                case "clear":
+                    ariaLabel = "clear entry";
+                    break;
             }
 
             WebElement btn = null;
@@ -251,7 +267,7 @@ public class TestCases {
             if (btn != null) {
                 btn.click();
                 System.out.println("ClickElement: " + label);
-                Thread.sleep(50);   // very small delay (you can set to 0)
+                Thread.sleep(50);
             } else {
                 System.out.println("Could not click: " + label);
             }
